@@ -1,8 +1,3 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-
 # Compiled Dynamic libraries
 *.so
 *.dylib
@@ -11,3 +6,19 @@
 *.lai
 *.la
 *.a
+
+# Compiled Object files
+*.o
+
+#temporary files
+*~
+
+#librarys
+nbproject
+build
+dist
+bin
+obj
+.dep.inc
+src/.cproject
+src/.project
