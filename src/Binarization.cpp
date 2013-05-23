@@ -1,5 +1,5 @@
 
-#include "inc/Binarization.h"
+#include "../inc/Binarization.h"
 
 
 /**

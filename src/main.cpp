@@ -1,5 +1,5 @@
-#include "inc/Parser.h"
-#include "inc/Binarization.h"
+#include "../inc/Parser.h"
+#include "../inc/Binarization.h"
 #include <iostream>
 
 int main(int argc, char * argv[]) {

@@ -1,4 +1,4 @@
-#include "inc/Parser.h"
+#include "../inc/Parser.h"
 #include <cstdio>
 
 
