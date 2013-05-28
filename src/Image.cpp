@@ -34,18 +34,18 @@ void Image::load(string fileName) {
     }
 
     reader.read((char*) &header, sizeof(BMPFileHeader));
-
+/*
     if (header < 1){
     	cerr << "Arquivo sem header";
         reader.close();
         exit(1);
-    }
-
+    }*/
+/*
     if (this->header.bfType != 'MB'){
     	cerr << "Não é arquico BMP";
         reader.close();
         exit(1);
-    }
+    }*/
 
     infosize = header.bfOffBits - 18;
     reader.read((char*) &info, infosize);
@@ -53,22 +53,5 @@ void Image::load(string fileName) {
     reader.read((char*) &bits, bitsize);
 
     reader.close();
-
-    //return (bits);
-
-    /* Swap red and blue */
-    //   length = ((*info)->bmiHeader.biWidth * 3 + 3) & ~3;
-    //   for (y = 0; y < (*info)->bmiHeader.biHeight; y ++)
-    //       for (ptr = bits + y * length, x = (*info)->bmiHeader.biWidth;
-    //            x > 0;
-   	//     x --, ptr += 3)
-   	//   {
-   	//    temp   = ptr[0];
-   	//    ptr[0] = ptr[1];
-   	//    ptr[1] = temp;
-   	//    }
-
-       /* OK, everything went fine - return the allocated bitmap... */
-
 }
 

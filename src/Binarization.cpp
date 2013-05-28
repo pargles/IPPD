@@ -9,6 +9,8 @@
 Binarization::Binarization(Parser *parse) {
     this->parser = parse;
     this->executionTime = 0;
+    Image *img = new Image();
+    img->load(parse->getImageAdress());
 }
 
 void Binarization::run() {

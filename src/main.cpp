@@ -14,9 +14,6 @@ int main(int argc, char * argv[]) {
 	/*
 	 *Adiciona cada entrada no vetor de strings
 	 */
-	Image *img = new Image();
-	img->load("lena.bmp");
-
 	for (int i = 0; i < argc; i++)
 		args.push_back(argv[i]);
 

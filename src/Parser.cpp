@@ -19,12 +19,16 @@ bool Parser::isParallel() {
 	return this->parallel;
 }
 
+void Parser::setParallel() {
+	this->parallel = true;
+}
+
 void Parser::setImageAdress(string Adress) {
     this->imageAdress = Adress;
 }
 
-void Parser::setParallel() {
-	this->parallel = true;
+string Parser::getImageAdress() {
+    return imageAdress;
 }
 
 void Parser::parse(vector<string> Arguments) {

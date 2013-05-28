@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "Image.h"
 #include <cstdio>
 #include <iostream>//cout
 class Binarization {
@@ -8,7 +9,8 @@ public:
     void run();
 private:
     Parser *parser;
-    int executionTime;
+    Image *img;
+    int executionTime;  
 
 };
 

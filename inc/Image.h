@@ -56,7 +56,7 @@ private:
 
 public:
     Image();
-    void Image::load(string Adress);
+    void load(string fileName);
 };
 
 
