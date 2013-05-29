@@ -5,15 +5,9 @@
 int main(int argc, char * argv[]) {
 	Parser *commands = new Parser();
 	Binarization *imageBinarization;
-	/*
-	 *Coloca em um vetor todos os argumentos
-	 *   a serem passados para o parser
-	 */
+	 //Coloca em um vetor todos os argumentos a serem passados para o parser
 	vector<string> args;
-
-	/*
-	 *Adiciona cada entrada no vetor de strings
-	 */
+	 //Adiciona cada entrada no vetor de string
 	for (int i = 0; i < argc; i++)
 		args.push_back(argv[i]);
 
