@@ -46,12 +46,18 @@ private:
     unsigned int **BLUE;
     unsigned int **GREEN;
     unsigned int **RED;
+    unsigned int **GRAY;
     string adress;
     
 public:
     Image(string imageAdress);
     void load();
     void printarInformacoesDaImagem();
-    void printarMatrizDeCor(unsigned int **matriz, int linhas, int colunas);
-    unsigned int **alocarMatriz(unsigned int **matriz, int linhas, int colunas);
+    void printarMatrizDeCor(unsigned int **matriz);
+    unsigned int **alocarMatriz(unsigned int **matriz);
+    unsigned int **parallelAlocarMatriz(unsigned int **matriz);
+    void salvarImagemRGB(string nomeArquivo);
+    void image2GrayScale();
+    void parallelImage2GrayScale();
+    void salvarImagemGrayScale(string nomeArquivo);
 };
