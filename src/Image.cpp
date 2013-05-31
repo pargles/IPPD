@@ -10,13 +10,17 @@
 Image::Image(string imageAdress) {
     adress = imageAdress;
     load();
+    //sequencialBinarization();
+    
+    //image2GrayScale();
     salvarImagemGrayScale("testesao.bmp");
+    //salvarImagemBlackAndWhite("NegaLena.bmp");
     //printarInformacoesDaImagem();
     //printarMatrizDeCor(GRAY);
-    salvarImagemRGB("out.bmp");
+    //salvarImagemRGB("out.bmp");
 }
 
-void Image::printarMatrizDeCor(unsigned int **matriz)
+void Image::printarMatrizDeCor(unsigned short **matriz)
 {
     for (int i = 0; i < bih->biHeight; i++) {
         for (int j = 0; j < bih->biWidth; j++) {
@@ -41,12 +45,11 @@ void Image::load() {
     temp = new char[sizeof(BITMAPINFOHEADER)];
     ifs.read(temp, sizeof(BITMAPINFOHEADER));
     bih = (BITMAPINFOHEADER*)(temp); 
-    
     printarInformacoesDaImagem();
     
-    BLUE = alocarMatriz(BLUE);
-    GREEN = alocarMatriz(GREEN);
-    RED = alocarMatriz(RED);
+    BLUE = parallelAlocarMatriz(BLUE);
+    GREEN = parallelAlocarMatriz(GREEN);
+    RED = parallelAlocarMatriz(RED);
     
     ifs.seekg(bfh->bfOffBits, ios::beg); // posiciona o ponteiro do arquivo aonde começam as informações de cor
     char r,g,b;
@@ -64,11 +67,11 @@ void Image::load() {
    // printarMatrizDeCor(BLUE,bih->biHeight,bih->biWidth);
 }
 
-unsigned int **Image::alocarMatriz(unsigned int **matriz) {
-    unsigned int **mat = new unsigned int*[bih->biHeight];
+unsigned short **Image::alocarMatriz(unsigned short **matriz) {
+    unsigned short **mat = new unsigned short*[bih->biHeight];
 
     for (int i = 0; i < bih->biHeight; ++i)
-        mat[i] = new unsigned int[bih->biWidth];
+        mat[i] = new unsigned short[bih->biWidth];
 
     //iniciando ela com zero
     for (int i = 0; i < bih->biHeight; ++i)
@@ -77,12 +80,12 @@ unsigned int **Image::alocarMatriz(unsigned int **matriz) {
         return mat;
 }
 
-unsigned int **Image::parallelAlocarMatriz(unsigned int **matriz) {
-    unsigned int **mat = new unsigned int*[bih->biHeight];
-
+unsigned short **Image::parallelAlocarMatriz(unsigned short **matriz) {
+    unsigned short **mat = new unsigned short*[bih->biHeight];
+#pragma omp parallel for
     for (int i = 0; i < bih->biHeight; ++i)
-        mat[i] = new unsigned int[bih->biWidth];
-
+        mat[i] = new unsigned short[bih->biWidth];
+#pragma omp parallel for
     //iniciando ela com zero
     for (int i = 0; i < bih->biHeight; ++i)
         for (int j = 0; j < bih->biWidth; ++j)
@@ -100,9 +103,9 @@ void Image::salvarImagemRGB(string nomeArquivo) {
     char r,g,b;
     for (int i = 0; i < bih->biHeight; i++) {
         for (int j = 0; j < bih->biWidth; j++) {
-             r = static_cast<char>(RED[i][j]);//recasting para ficar unsigned
+            r = static_cast<char>(RED[i][j]);//recasting para ficar unsigned
             pictureOut.write(&r,sizeof(char));
-             g = static_cast<char>(GREEN[i][j]);//recasting para ficar unsigned
+            g = static_cast<char>(GREEN[i][j]);//recasting para ficar unsigned
             pictureOut.write(&g,sizeof(char));
             b = static_cast<char>(BLUE[i][j]);//recasting para ficar unsigned
             pictureOut.write(&b,sizeof(char));     
@@ -118,10 +121,12 @@ void Image::image2GrayScale() {
             GRAY[i][j]= static_cast<unsigned int>(0.2989 * RED[i][j] + 0.5870 * GREEN[i][j] + 0.1140 * BLUE[i][j]);
         }
     }
+    printarMatrizDeCor(GRAY);
 }
 
 void Image::parallelImage2GrayScale() {
     GRAY = alocarMatriz(GRAY);
+    #pragma omp parallel for
      for (int i = 0; i < bih->biHeight; i++) {
         for (int j = 0; j < bih->biWidth; j++) {
             GRAY[i][j]= static_cast<unsigned int>(0.2989 * RED[i][j] + 0.5870 * GREEN[i][j] + 0.1140 * BLUE[i][j]);
@@ -130,13 +135,12 @@ void Image::parallelImage2GrayScale() {
 }
 
 void Image::salvarImagemGrayScale(string nomeArquivo) {
-    image2GrayScale();
+    parallelImage2GrayScale();
     ofstream pictureOut;
     int seek = bfh->bfOffBits;
     int tamanhoRGB=bfh->bfSize;
     unsigned short bitsPorPixel= bih->biBitCount;
     unsigned int tamanhoDaImagem=bih->biSizeImage;
-    unsigned int paletaCores=bih->biClrUsed;
     pictureOut.open(nomeArquivo.c_str(),ios::out | ios::app | ios::binary);
     bfh->bfOffBits = 1078;//seek da imagem grayScale
     bfh->bfSize = bih->biHeight*bih->biWidth+bfh->bfOffBits;//tamanho do arquivo grayScale
@@ -145,6 +149,7 @@ void Image::salvarImagemGrayScale(string nomeArquivo) {
     bih->biBitCount=8;//gray scale, so uma matriz
     bih->biSizeImage=bih->biHeight*bih->biWidth;//tamanho da imagem grayScale
     bih->biClrUsed=256;//256 bits por pixels
+    bih->biClrImportant=256;
     temp=(char*)bih;
     pictureOut.write(temp,sizeof(BITMAPINFOHEADER));
     char gray;
@@ -153,6 +158,68 @@ void Image::salvarImagemGrayScale(string nomeArquivo) {
         for (int j = 0; j < bih->biWidth; j++) {
             gray = static_cast<char>(GRAY[i][j]);//recasting para ficar unsigned
             pictureOut.write(&gray,sizeof(char));
+        }
+    }
+    bfh->bfSize = tamanhoRGB;//devolvendo os valores originais da imagem RGB
+    bfh->bfOffBits = seek;
+    bih->biBitCount=bitsPorPixel;
+    bih->biSizeImage=tamanhoDaImagem;
+    bih->biClrImportant=0;
+    bih->biClrUsed = 0;
+    
+    pictureOut.close();
+}
+
+void Image::sequencialBinarization() {
+    image2GrayScale();//necessario ter a matriz em grayScale
+    BandW = parallelAlocarMatriz(BandW);
+    int max=0,min=255,average=0;
+    for (int i = 0; i < bih->biHeight; i++) {
+        for (int j = 0; j < bih->biWidth; j++) {
+            if(GRAY[i][j]>max)
+                max=    GRAY[i][j];
+            if(GRAY[i][j]<min)
+                min=    GRAY[i][j];
+        }
+    }
+    this->maiorPixel = max;
+    this->menorPixel = min;
+    average = max/min;
+    this->mediaPixels = average;
+    for (int i = 0; i < bih->biHeight; i++) {
+        for (int j = 0; j < bih->biWidth; j++) {
+            if(GRAY[i][j]>average)
+                BandW[i][j] = 0;
+            else BandW[i][j] = 128;
+        }
+    }
+        //printarMatrizDeCor(BandW);    
+}
+
+void Image::salvarImagemBlackAndWhite(string nomeArquivo) {
+    sequencialBinarization();
+    ofstream pictureOut;
+    int seek = bfh->bfOffBits;
+    int tamanhoRGB=bfh->bfSize;
+    unsigned short bitsPorPixel= bih->biBitCount;
+    unsigned int tamanhoDaImagem=bih->biSizeImage;
+    unsigned int paletaCores=bih->biClrUsed;
+    pictureOut.open(nomeArquivo.c_str(),ios::out | ios::app | ios::binary);
+    bfh->bfOffBits = 1078;//seek da imagem preto e branco
+    bfh->bfSize = bih->biHeight*bih->biWidth+bfh->bfOffBits;//tamanho do arquivo grayScale
+    char *temp = (char*)bfh;
+    pictureOut.write(temp,sizeof(BITMAPFILEHEADER));
+    bih->biBitCount=8;//preto e branco scale, so uma matriz
+    bih->biSizeImage=bih->biHeight*bih->biWidth;//tamanho da imagem grayScale
+    bih->biClrUsed=256;//256 bits por pixels
+    temp=(char*)bih;
+    pictureOut.write(temp,sizeof(BITMAPINFOHEADER));
+    char bw;
+    
+    for (int i = 0; i < bih->biHeight; i++) {
+        for (int j = 0; j < bih->biWidth; j++) {
+            bw = static_cast<char>(GRAY[i][j]);//recasting para ficar unsigned
+            pictureOut.write(&bw,sizeof(char));
         }
     }
     bfh->bfSize = tamanhoRGB;//devolvendo os valores originais da imagem RGB
@@ -169,7 +236,7 @@ void Image::printarInformacoesDaImagem() {
     cout << "\n FILHEADER\n";
     cout << "\n File type: " << bfh->bfType[0] << bfh->bfType[1] << endl;
     cout << " File size: " << bfh->bfSize << endl;
-    cout << " ==>>Offset(adress of beggining of the image information): " << bfh->bfOffBits << endl;
+    cout << " Offset(adress of beggining of the image information): " << bfh->bfOffBits << endl;
     cout << "\n INFOHEADER\n";
     cout << "\n Header size: " << bih->biSize << endl;
     cout << " Image width: " << bih->biWidth << endl;

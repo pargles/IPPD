@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-
+ #include <omp.h>
 
 using namespace std;
  
@@ -43,21 +43,27 @@ private:
     struct BITMAPFILEHEADER* bfh;
     struct BITMAPINFOHEADER* bih;
     
-    unsigned int **BLUE;
-    unsigned int **GREEN;
-    unsigned int **RED;
-    unsigned int **GRAY;
+    unsigned short **BLUE;
+    unsigned short **GREEN;
+    unsigned short **RED;
+    unsigned short **GRAY;
+    unsigned short **BandW;//colocar na classe binarization
     string adress;
+    int maiorPixel;//colocar na classe binarization
+    int menorPixel;//colocar na classe binarization
+    int mediaPixels;//colocar na classe binarization
     
 public:
     Image(string imageAdress);
     void load();
     void printarInformacoesDaImagem();
-    void printarMatrizDeCor(unsigned int **matriz);
-    unsigned int **alocarMatriz(unsigned int **matriz);
-    unsigned int **parallelAlocarMatriz(unsigned int **matriz);
+    void printarMatrizDeCor(unsigned short **matriz);
+    unsigned short **alocarMatriz(unsigned short **matriz);
+    unsigned short **parallelAlocarMatriz(unsigned short **matriz);
     void salvarImagemRGB(string nomeArquivo);
     void image2GrayScale();
     void parallelImage2GrayScale();
     void salvarImagemGrayScale(string nomeArquivo);
+    void sequencialBinarization();//colocar na classe binarization
+    void salvarImagemBlackAndWhite(string nomeArquivo);
 };
