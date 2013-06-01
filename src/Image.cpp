@@ -135,39 +135,27 @@ void Image::parallelImage2GrayScale() {
 }
 
 void Image::salvarImagemGrayScale(string nomeArquivo) {
-    parallelImage2GrayScale();
-    ofstream pictureOut;
-    int seek = bfh->bfOffBits;
-    int tamanhoRGB=bfh->bfSize;
-    unsigned short bitsPorPixel= bih->biBitCount;
-    unsigned int tamanhoDaImagem=bih->biSizeImage;
+ofstream pictureOut;
     pictureOut.open(nomeArquivo.c_str(),ios::out | ios::app | ios::binary);
-    bfh->bfOffBits = 1078;//seek da imagem grayScale
-    bfh->bfSize = bih->biHeight*bih->biWidth+bfh->bfOffBits;//tamanho do arquivo grayScale
+    
     char *temp = (char*)bfh;
     pictureOut.write(temp,sizeof(BITMAPFILEHEADER));
-    bih->biBitCount=8;//gray scale, so uma matriz
-    bih->biSizeImage=bih->biHeight*bih->biWidth;//tamanho da imagem grayScale
-    bih->biClrUsed=256;//256 bits por pixels
-    bih->biClrImportant=256;
     temp=(char*)bih;
     pictureOut.write(temp,sizeof(BITMAPINFOHEADER));
-    char gray;
-    
+    char r,g,b, gray;
     for (int i = 0; i < bih->biHeight; i++) {
         for (int j = 0; j < bih->biWidth; j++) {
-            gray = static_cast<char>(GRAY[i][j]);//recasting para ficar unsigned
+            r = static_cast<char>(RED[i][j] * 0.2989);//recasting para ficar unsigned
+            g = static_cast<char>(GREEN[i][j] * 0.5870);//recasting para ficar unsigned
+            b = static_cast<char>(BLUE[i][j] * 0.1140 );//recasting para ficar unsigned
+            gray = r + g + b;
             pictureOut.write(&gray,sizeof(char));
-        }
+            pictureOut.write(&gray,sizeof(char));
+            pictureOut.write(&gray,sizeof(char));
+          }
     }
-    bfh->bfSize = tamanhoRGB;//devolvendo os valores originais da imagem RGB
-    bfh->bfOffBits = seek;
-    bih->biBitCount=bitsPorPixel;
-    bih->biSizeImage=tamanhoDaImagem;
-    bih->biClrImportant=0;
-    bih->biClrUsed = 0;
     
-    pictureOut.close();
+    pictureOut.close();    
 }
 
 void Image::sequencialBinarization() {
