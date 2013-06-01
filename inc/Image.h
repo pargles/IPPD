@@ -66,4 +66,5 @@ public:
     void salvarImagemGrayScale(string nomeArquivo);
     void sequencialBinarization();//colocar na classe binarization
     void salvarImagemBlackAndWhite(string nomeArquivo);
+    void parallelBinarization();
 };
