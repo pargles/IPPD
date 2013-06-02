@@ -5,17 +5,14 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
- #include <omp.h>
-
+#include <omp.h>
+#include "Image.h"
 using namespace std;
- 
-class Image {
- 
-private:
-   
+
+class ImageLoader {
     
 public:
-    #pragma pack(2)//The header needs to be 2 byte aligned.
+    /*#pragma pack(2)//The header needs to be 2 byte aligned.
     struct BITMAPFILEHEADER // File header
     {
         char bfType[2]; // File type: should be BM ( 0x42 0x4D ) 
@@ -39,20 +36,20 @@ public:
         unsigned int biClrUsed; // Number of colors in the color palette, or 0 to default to 2^n ( 0- no palette)
         unsigned int biClrImportant; // Number of important colors used
     };  
-    #pragma pack() // and this
-    struct BITMAPFILEHEADER* bfh;
-    struct BITMAPINFOHEADER* bih;
-    Image(unsigned short **r, unsigned short **g, unsigned short **b, BITMAPFILEHEADER *bfh, BITMAPINFOHEADER *bih);
-    void printarInformacoesDaImagem();
-    void printarMatrizDeCor(unsigned short **matriz);
-    void toGrayScale();
-    void toGrayScaleParallel();
-    void salvarImagemRGB(string nomeArquivo);
-    void salvarImagemGrayScale(string nomeArquivo);
-    void salvarImagemBlackAndWhite(string nomeArquivo);
-    
-    
+    #pragma pack() // and this*/
+    ImageLoader(string path);
+    void load();
+    virtual unsigned short **alocarMatriz(unsigned short **matriz)=0;
+    Image::BITMAPFILEHEADER* bfh;
+    Image::BITMAPINFOHEADER* bih;
     unsigned short **BLUE;
     unsigned short **GREEN;
     unsigned short **RED;
+    string path;
+    Image *image;
+    
+private:
+    
 };
+
+

@@ -1,17 +1,15 @@
-#include "Parser.h"
+#pragma once
 #include "Image.h"
 #include <cstdio>
 #include <iostream>//cout
+
 class Binarization {
     
 public:
-    Binarization(Parser *parse);
-    void run();
-    void sequencialBin();
-    void parallelBin();
-private:
-    Parser *parser;
+    Binarization(Image *im);
+    virtual void run()=0;
     Image *img;
+private:
     int executionTime;  
 
 };
