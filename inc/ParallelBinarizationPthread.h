@@ -21,6 +21,9 @@ using namespace std;
 typedef struct _ARGS{
         Image *img;
         int i;
+        int j;
+        int iMax;
+        int jMax;
         short thresh;
 }ARGS;
 
