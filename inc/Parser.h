@@ -15,12 +15,16 @@ class Parser {
 
 	private:
             bool parallel;//1.1
+            bool parallelPthread;//1.1
             string imageAdress;
 
 	public:
 		Parser();
                 bool isParallel();
+
+                bool isParallelPthread() ;
                 void setParallel();
+                void setParallelPthread();
                 string getImageAdress();
                 void setImageAdress(string Adress);
 		void parse(vector<string> Arguments);

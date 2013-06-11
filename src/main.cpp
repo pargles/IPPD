@@ -3,6 +3,8 @@
 #include "../inc/ImageLoader.h"
 #include "../inc/ParallelImageLoader.h"
 #include "../inc/ParallelBinarization.h"
+#include "../inc/ParallelImageLoaderPthread.h"
+#include "../inc/ParallelBinarizationPthread.h"
 #include "../inc/SequentialImageLoader.h"
 #include "../inc/SequentialBinarization.h"
 #include <iostream>
@@ -28,6 +30,9 @@ int main(int argc, char * argv[]) {
         if (commands->isParallel()){
             imgLoader = new ParallelImageLoader(commands->getImageAdress());
             imageBinarization = new ParallelBinarization(imgLoader->image);
+        }else if(commands->isParallelPthread()){
+            imgLoader = new ParallelImageLoaderPthread(commands->getImageAdress());
+            imageBinarization = new ParallelBinarizationPthread(imgLoader->image);
         }else{
             imgLoader = new SequentialImageLoader(commands->getImageAdress());
             imageBinarization = new SequentialBinarization(imgLoader->image);
