@@ -34,6 +34,12 @@ void ImageLoader::load() {
     BLUE = alocarMatriz(BLUE);
     GREEN = alocarMatriz(GREEN);
     RED = alocarMatriz(RED);
+    COINS = alocarMatriz(COINS);
+    for (int i = 0; i < bih->biHeight; i++) {
+        for (int j = 0; j < bih->biWidth; j++) {
+			COINS[i][j] = BRANCO;
+		}
+	}
     
     ifs.seekg(bfh->bfOffBits, ios::beg); // posiciona o ponteiro do arquivo aonde começam as informações de cor
     char r,g,b;
@@ -47,7 +53,7 @@ void ImageLoader::load() {
             BLUE[i][j] = static_cast<unsigned char>(b);//recasting para ficar unsigned   
         }
     }
-    image = new Image(RED,GREEN,BLUE,bfh,bih);
+    image = new Image(RED,GREEN,BLUE,COINS,bfh,bih);
     //image->printarMatrizDeCor(BLUE);
 }
 

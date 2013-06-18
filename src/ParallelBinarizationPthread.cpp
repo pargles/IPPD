@@ -133,7 +133,7 @@ void ParallelBinarizationPthread::run() {
     img->toGrayScaleParallel(); //necessario ter a matriz em grayScale
     int larguraImg = img->bih->biWidth;
     int alturaImg = img->bih->biHeight;
-    short thresh = otsuThresholding(img);
+    short thresh = 245;
     cout << "thresh " << thresh << endl;
     //pthread
     int status[4], rc[4];

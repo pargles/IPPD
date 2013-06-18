@@ -3,7 +3,6 @@
 short ParallelBinarization::simpleThresholding(Image *img){
     int max=-1,min=256;
     #pragma omp parallel for
-    {
         for (int i = 0; i < img->bih->biHeight; i++) {
             for (int j = 0; j < img->bih->biWidth; j++) {
                 if((img->RED[i][j]) > max)
@@ -12,7 +11,6 @@ short ParallelBinarization::simpleThresholding(Image *img){
                     min = (img->RED[i][j]);
             }
         }
-    }
     //cout << max;
     return (max + min)/2;
 }
@@ -70,12 +68,10 @@ short ParallelBinarization::otsuThresholding(Image *img){
 }
 
 void ParallelBinarization::run(){
-    int initTime = clock();
     img->toGrayScaleParallel();   //necessario ter a matriz em grayScale
-    short thresh = otsuThresholding(img);
+    short thresh = 245;
     cout << "thresh " << thresh << endl;
     #pragma omp parallel for
-    {
         for (int i = 0; i < img->bih->biHeight; i++) {
             for (int j = 0; j < img->bih->biWidth; j++) {
                 if((img->RED[i][j]) > thresh)
@@ -83,9 +79,7 @@ void ParallelBinarization::run(){
                 else img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 0;
             }
         }
-    }
     cout << "binarizacao paralela" << "\n";
-    cout << "tempo: " << clock() - initTime;
 }
     
 

@@ -7,12 +7,18 @@
 #include "../inc/ParallelBinarizationPthread.h"
 #include "../inc/SequentialImageLoader.h"
 #include "../inc/SequentialBinarization.h"
+#include "../inc/CoinCounter.h"
+#include "../inc/SequentialCoinCounter.h"
+#include "../inc/OMPCoinCounter.h"
+#include "../inc/PthreadCoinCounter.h"
 #include <iostream>
 
 int main(int argc, char * argv[]) {
-    
+    int numCPU; 
+	
 	Parser *commands = new Parser();
 	Binarization *imageBinarization;
+	CoinCounter *coins;
         ImageLoader *imgLoader;
 	 //Coloca em um vetor todos os argumentos a serem passados para o parser
 	vector<string> args;
@@ -26,18 +32,26 @@ int main(int argc, char * argv[]) {
                 exit(1);
 	}
 	commands->parse(args);
+	
+	numCPU = commands->getNumCores();
+	omp_set_num_threads(numCPU);
+	cout << "voce tem: "<<numCPU<<" processadores"<<endl;
         
-        if (commands->isParallel()){
+        if (commands->isOMP()){
             imgLoader = new ParallelImageLoader(commands->getImageAdress());
             imageBinarization = new ParallelBinarization(imgLoader->image);
-        }else if(commands->isParallelPthread()){
+            coins = new OMPCoinCounter(imgLoader->image);
+        }else if(commands->isPthread()){
             imgLoader = new ParallelImageLoaderPthread(commands->getImageAdress());
             imageBinarization = new ParallelBinarizationPthread(imgLoader->image);
+            coins = new PthreadCoinCounter(imgLoader->image);
         }else{
             imgLoader = new SequentialImageLoader(commands->getImageAdress());
             imageBinarization = new SequentialBinarization(imgLoader->image);
+            coins = new SequentialCoinCounter(imgLoader->image);
         }
-	imageBinarization->run();
-        imgLoader->image->salvarImagemRGB("out.bmp");
+		imageBinarization->run();
+		cout<< "moedas "<< coins->run()<<endl;
+        imgLoader->image->salvarImagemRGB(commands->getImageOutName());
 	return 0;
 }

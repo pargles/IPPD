@@ -74,7 +74,7 @@ short SequentialBinarization::otsuThresholding(Image *img){
 void SequentialBinarization::run() {
     int initTime = clock();
     img->toGrayScale();         //necessario ter a matriz em grayScale
-    short thresh = otsuThresholding(img);
+    short thresh = 245;
     cout << "thresh " << thresh << endl;
     for (int i = 0; i < img->bih->biHeight; i++) {
         for (int j = 0; j < img->bih->biWidth; j++) {
@@ -83,7 +83,5 @@ void SequentialBinarization::run() {
             else img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 0;
         }
     }
-    cout << "binarizacao sequencial" << "\n";
-    cout << "tempo: " << clock() - initTime; 
 }
 

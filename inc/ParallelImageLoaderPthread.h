@@ -3,14 +3,7 @@
  * Author: vanderson
  *
  * Created on 9 de Junho de 2013, 22:02
- */
-#include <iostream>// cout
-#include <string>
-#include <vector>
-#include <cstdio>
-#include <cstdlib>
-#include <fstream>
-#include <pthread.h>
+*/
 #include "ImageLoader.h"
 
 

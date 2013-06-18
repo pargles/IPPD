@@ -7,10 +7,11 @@
 
 #include "../inc/Image.h"
 
-Image::Image(unsigned short **r, unsigned short **g, unsigned short **b, BITMAPFILEHEADER *bfh, BITMAPINFOHEADER *bih) {
+Image::Image(unsigned short **r, unsigned short **g, unsigned short **b, unsigned short **c, BITMAPFILEHEADER *bfh, BITMAPINFOHEADER *bih) {
     RED = r;
     GREEN = g;
     BLUE = b;
+    COINS = c;
     this->bfh = bfh;
     this->bih = bih;
 }
@@ -62,9 +63,8 @@ void Image::toGrayScale(){
 }
 
 void Image::toGrayScaleParallel() {
-    #pragma omp parallel for 
-    {
      unsigned short r,g,b, gray;
+#pragma omp parallel for
         for (int i = 0; i < bih->biHeight; i++) {
             for (int j = 0; j < bih->biWidth; j++) {
                 r = (RED[i][j] * 0.2989);//recasting para ficar unsigned
@@ -76,8 +76,59 @@ void Image::toGrayScaleParallel() {
                 BLUE[i][j] = gray;
             }
         }
-    }
 }
+
+int Image::posicaoCentral(int i,int j)
+{
+	int contDir=j,contEsq=j;
+	register int k=j;
+	COINS[i][k]=PRETO;
+	while(RED[i][k+1]==PRETO)
+	{
+		k++;contDir++;COINS[i][k]=PRETO;
+	}
+	k=j;
+	while(RED[i][k-1]==PRETO)
+	{
+		k--;contEsq--;COINS[i][k]=PRETO;
+	}
+	
+	return contEsq+((contDir-contEsq)/2);
+}
+
+int Image::contarMoedas(int HeightStart, int HeightEnd) {
+    register int m, n;
+    int moedas = 0;
+    for (int i = HeightStart + 1; i < HeightEnd - 1; i++) {
+        for (int j = 1; j < bih->biWidth - 1; j++) {
+            if (RED[i - 1][j - 1] == PRETO && RED[i - 1][j] == PRETO && RED[i - 1][j + 1] == PRETO &&
+                    RED[i][j - 1] == PRETO && RED[i][j] == PRETO && RED[i][j + 1] == PRETO &&
+                    RED[i + 1][j - 1] == PRETO && RED[i + 1][j] == PRETO && RED[i + 1][j + 1] == PRETO) {
+                if (COINS[i - 1][j - 1] == BRANCO && COINS[i - 1][j] == BRANCO && COINS[i - 1][j + 1] == BRANCO &&
+                        COINS[i][j - 1] == BRANCO && COINS[i][j] == BRANCO && COINS[i][j + 1] == BRANCO &&
+                        COINS[i + 1][j - 1] == BRANCO && COINS[i + 1][j] == BRANCO && COINS[i + 1][j + 1] == BRANCO) {
+                    moedas++;
+                    m = i;
+                    n = j;
+                    while (RED[m][n] == PRETO) {
+                        n = posicaoCentral(m, n);
+                        m--;
+                    }
+                    m = i;
+                    n = j;
+                    while (RED[m][n] == PRETO) {
+                        n = posicaoCentral(m, n);
+                        m++;
+                    }
+
+                }
+            }
+        }
+    }
+
+    return moedas;
+}
+
 ///////////////////////////////////////////////////////////////////
 
 

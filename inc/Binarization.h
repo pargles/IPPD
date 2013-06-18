@@ -1,7 +1,5 @@
 #pragma once
 #include "Image.h"
-#include <cstdio>
-#include <iostream>//cout
 
 class Binarization {
     

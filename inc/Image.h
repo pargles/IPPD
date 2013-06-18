@@ -5,8 +5,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
+#include <time.h>
  #include <omp.h>
-
+#define PRETO 0
+#define BRANCO 255
 using namespace std;
  
 class Image {
@@ -42,7 +44,7 @@ public:
     #pragma pack() // and this
     struct BITMAPFILEHEADER* bfh;
     struct BITMAPINFOHEADER* bih;
-    Image(unsigned short **r, unsigned short **g, unsigned short **b, BITMAPFILEHEADER *bfh, BITMAPINFOHEADER *bih);
+    Image(unsigned short **r, unsigned short **g, unsigned short **b, unsigned short **c, BITMAPFILEHEADER *bfh, BITMAPINFOHEADER *bih);
     void printarInformacoesDaImagem();
     void printarMatrizDeCor(unsigned short **matriz);
     void toGrayScale();
@@ -50,9 +52,12 @@ public:
     void salvarImagemRGB(string nomeArquivo);
     void salvarImagemGrayScale(string nomeArquivo);
     void salvarImagemBlackAndWhite(string nomeArquivo);
+    int posicaoCentral(int i,int j);
+    int contarMoedas(int HeightStart, int HeightEnd);
     
     
     unsigned short **BLUE;
     unsigned short **GREEN;
     unsigned short **RED;
+    unsigned short **COINS;
 };

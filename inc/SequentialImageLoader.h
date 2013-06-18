@@ -1,11 +1,4 @@
 #pragma once
-#include <iostream>// cout
-#include <string>
-#include <vector>
-#include <cstdio>
-#include <cstdlib>
-#include <fstream>
- #include <omp.h>
 #include "ImageLoader.h"
 using namespace std;
 class SequentialImageLoader : public ImageLoader {

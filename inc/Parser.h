@@ -4,6 +4,14 @@
 #include <vector>
 #include <cstdio>
 #include <cstdlib>
+#ifdef _WIN32
+#include <windows.h>
+#elif MACOS
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#else
+#include <unistd.h>
+#endif
 
 using namespace std;
 
@@ -14,18 +22,36 @@ using namespace std;
 class Parser {
 
 	private:
-            bool parallel;//1.1
-            bool parallelPthread;//1.1
+            bool omp;//1.1
+            bool pthread;//1.2
+            bool showTasks;
+            bool otsu;
+            bool showHeaderInfo;
+            bool imageOut;
+            string imageOutName;
             string imageAdress;
-
-	public:
+            short numOfThreads;
+   	public:
 		Parser();
-                bool isParallel();
+                bool isOMP();
+                bool isPthread() ;
+                bool isOTSU() ;
+                bool isshowHeader() ;
+                bool isshowTasks() ;
+                bool isimageOut() ;
+                void setOMP();
+                void setPthread();
+                void setTasks();
+                void setImageOut();
+                void setOTSU();
+                 void setShowHeader();
 
-                bool isParallelPthread() ;
-                void setParallel();
-                void setParallelPthread();
                 string getImageAdress();
+                string getImageOutName();
+                int getNumCores();
+                int getNumOfThreads();
+                void setNumOfThreads(int num);
                 void setImageAdress(string Adress);
+                void setImageOutName(string name);
 		void parse(vector<string> Arguments);
 };
