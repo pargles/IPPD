@@ -24,7 +24,7 @@ void *largura(void *p) {
 }
 
 void *sthresholding(void *p){
-    int max = -1, min = 256;
+    int min=-1,max=256;
     int iMax = ((ARGS *) p)->iMax;
     int jMax = ((ARGS *) p)->jMax;
     Image *img = ((ARGS *) p)->img;
@@ -36,27 +36,16 @@ void *sthresholding(void *p){
                     min = (img->RED[i][j]);
             }
         }
+     ((ARGS *) p)->minMax=(min+max)/2;
 }
-/*
-void *othresholding(void *p){
 
-for (int i = 0; i < img->bih->biHeight; i++) {
-        for (int j = 0; j < img->bih->biWidth; j++) {
-            int h = 0xFF & img->BLUE[i][j];
-            histData[h]++;
-            ptr++;
-        }
-    }
-}
-*/
 short ParallelBinarizationPthread::simpleThresholding(Image *img) {
-    int max = -1, min = 256;
-    int status[4], rc[4],i;
+    int retorno;
+    int status[4], rc[4];
     pthread_t operarios[4];
-   
     for (int i = 0; i < 4; i++) {
         argumentos[i].img = img;
-        
+        argumentos[i].minMax=0;
         status[i] = pthread_create(&(operarios[i]), NULL, sthresholding, (void *) &argumentos[i]);
         if (status[i])
             exit(-1);
@@ -66,28 +55,15 @@ short ParallelBinarizationPthread::simpleThresholding(Image *img) {
         if (status[i])
             exit(-1);
     }
-    //#pragma omp parallel for
-    /*
-    for (int i = 0; i < img->bih->biHeight; i++) {
-            for (int j = 0; j < img->bih->biWidth; j++) {
-                if ((img->RED[i][j]) > max)
-                    max = (img->RED[i][j]);
-                if (img->RED[i][j] < min)
-                    min = (img->RED[i][j]);
-            }
-        }
-    */
-    //cout << max;
-    return (max + min) / 2;
+    for(int j=0;j<4;j++)
+        retorno+=argumentos[j].minMax;
+    return retorno;
 }
 
 short ParallelBinarizationPthread::otsuThresholding(Image *img) {
-    // Calculate histogram
     int ptr = 0;
     short *histData = new short[256];
-    //#pragma omg parallel for
     for (int i = 0; i < 256; i++) histData[i] = 0;
-    //#pragma omg parallel for
     for (int i = 0; i < img->bih->biHeight; i++) {
         for (int j = 0; j < img->bih->biWidth; j++) {
             int h = 0xFF & img->BLUE[i][j];
@@ -95,25 +71,22 @@ short ParallelBinarizationPthread::otsuThresholding(Image *img) {
             ptr++;
         }
     }
-
-    // Total number of pixels
     int total = img->bih->biHeight * img->bih->biWidth;
-
     float sum = 0;
-    for (int t = 0; t < 256; t++) sum += t * histData[t];
-
+    for (int t = 0; t < 256; t++) 
+        sum += t * histData[t];
     float sumB = 0;
     int wB = 0;
     int wF = 0;
-
     float varMax = 0;
     short threshold = 0;
-    // #pragma omg parallel for
     for (int t = 0; t < 256; t++) {
         wB += histData[t]; // Weight Background
-        if (wB == 0) continue;
+        if (wB == 0)
+            continue;
         wF = total - wB; // Weight Foreground
-        if (wF == 0) break;
+        if (wF == 0) 
+            break;
         sumB += (float) (t * histData[t]);
         float mB = sumB / wB; // Mean Background
         float mF = (sum - sumB) / wF; // Mean Foreground
@@ -127,44 +100,13 @@ short ParallelBinarizationPthread::otsuThresholding(Image *img) {
     }
     return threshold;
 }
-
 void ParallelBinarizationPthread::run() {
-    int initTime = clock();
-    img->toGrayScaleParallel(); //necessario ter a matriz em grayScale
-    int larguraImg = img->bih->biWidth;
-    int alturaImg = img->bih->biHeight;
-    short thresh = 245;
-    cout << "thresh " << thresh << endl;
-    //pthread
+    img->toGrayScaleParallel();
     int status[4], rc[4];
     pthread_t operarios[4];
-    /*
-    ARGS argumentos[4];
-
-    //primeiro quadrante
-    argumentos[0].j = 0;
-    argumentos[0].i = 0;
-    argumentos[0].jMax = larguraImg - (larguraImg / 2);
-    argumentos[0].iMax = alturaImg - (alturaImg / 2);
-    //segundo quadrante
-    argumentos[1].j = larguraImg - (larguraImg / 2);
-    argumentos[1].i = 0;
-    argumentos[1].jMax = larguraImg;
-    argumentos[1].iMax = alturaImg - (alturaImg / 2);
-    //terceiro quadrante
-    argumentos[2].j = 0;
-    argumentos[2].i = alturaImg - (alturaImg / 2);
-    argumentos[2].jMax = larguraImg - (larguraImg / 2);
-    argumentos[2].iMax = alturaImg;
-    //quarto quadrante
-    argumentos[3].j = larguraImg - (larguraImg / 2);
-    argumentos[3].i = alturaImg - (alturaImg / 2);
-    argumentos[3].jMax = larguraImg;
-    argumentos[3].iMax = alturaImg;
-*/
     for (int i = 0; i < 4; i++) {
         argumentos[i].img = img;
-        argumentos[i].thresh = thresh;
+        argumentos[i].thresh = 245;
         status[i] = pthread_create(&(operarios[i]), NULL, largura, (void *) &argumentos[i]);
         if (status[i])
             exit(-1);
@@ -174,9 +116,7 @@ void ParallelBinarizationPthread::run() {
         if (status[i])
             exit(-1);
     }
-
     cout << "binarizacao paralela pthread" << "\n";
-    cout << "tempo pthread: " << clock() - initTime;
 }
 
 

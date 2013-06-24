@@ -15,35 +15,20 @@ typedef struct _ARGS{
         int iMax;
         int jMax;
         short thresh;
+        int minMax;
 }ARGS;
 
 class ParallelBinarizationPthread : public Binarization {
 public:
     ParallelBinarizationPthread(Image *im) : Binarization(im){
     int larguraImg = img->bih->biWidth;
-    int alturaImg = img->bih->biHeight;
-    
-    //primeiro quadrante
-    argumentos[0].j = 0;
-    argumentos[0].i = 0;
-    argumentos[0].jMax = larguraImg - (larguraImg / 2);
-    argumentos[0].iMax = alturaImg - (alturaImg / 2);
-    //segundo quadrante
-    argumentos[1].j = larguraImg - (larguraImg / 2);
-    argumentos[1].i = 0;
-    argumentos[1].jMax = larguraImg;
-    argumentos[1].iMax = alturaImg - (alturaImg / 2);
-    //terceiro quadrante
-    argumentos[2].j = 0;
-    argumentos[2].i = alturaImg - (alturaImg / 2);
-    argumentos[2].jMax = larguraImg - (larguraImg / 2);
-    argumentos[2].iMax = alturaImg;
-    //quarto quadrante
-    argumentos[3].j = larguraImg - (larguraImg / 2);
-    argumentos[3].i = alturaImg - (alturaImg / 2);
-    argumentos[3].jMax = larguraImg;
-    argumentos[3].iMax = alturaImg;
-    
+    int faixa=img->bih->biHeight/4;
+    for(int i=0;i<4;i++){
+      argumentos[0].j = 0;
+      argumentos[i].jMax = larguraImg;
+      argumentos[i].i=i*faixa;
+      argumentos[i].iMax=(i+1)*faixa;
+    }
     };
     void run();
     

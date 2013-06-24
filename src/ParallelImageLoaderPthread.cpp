@@ -1,7 +1,4 @@
 /* 
- * File:   ParallelImageLoaderPthread.cpp
- * Author: vanderson
- * 
  * Created on 9 de Junho de 2013, 22:02
  */
 
@@ -19,40 +16,17 @@ unsigned short **ParallelImageLoaderPthread::alocarMatriz(unsigned short **matri
     unsigned short **mat = new unsigned short*[bih->biHeight];
     int alturaImg=bih->biHeight;
     int larguraImg=bih->biWidth;
-
     for (int i = 0; i < bih->biHeight; ++i)
         mat[i] = new unsigned short[bih->biWidth];
-
-    //iniciando ela com zero
-    //pthread
-     int status[4],rc[4],i;
+    int status[4],rc[4],i;
     pthread_t operarios[4];
     ARGSI argumentos[4];
-   
-    //primeiro quadrante
-    argumentos[0].j=0;
-    argumentos[0].i=0;
-    argumentos[0].jMax=larguraImg-(larguraImg/2);
-    argumentos[0].iMax=alturaImg-(alturaImg/2);
-    //segundo quadrante
-    argumentos[1].j=larguraImg-(larguraImg/2);
-    argumentos[1].i=0;
-    argumentos[1].jMax=larguraImg;
-    argumentos[1].iMax=alturaImg-(alturaImg/2);
-    //terceiro quadrante
-     argumentos[2].j=0;
-     argumentos[2].i=alturaImg-(alturaImg/2);
-     argumentos[2].jMax=larguraImg-(larguraImg/2);
-     argumentos[2].iMax=alturaImg;
-     //quarto quadrante
-      argumentos[3].j=alturaImg-(alturaImg/2);
-     argumentos[3].i=alturaImg-(alturaImg/2);
-     argumentos[3].jMax=larguraImg;
-     argumentos[3].iMax=alturaImg;
-     
-     
-      for( i=0;i<4;i++){
+    for( i=0;i<4;i++){
        argumentos[i].mat=mat;
+       argumentos[i].j=0;
+       argumentos[i].jMax=larguraImg;
+       argumentos[i].i=i*(alturaImg/4);
+       argumentos[i].iMax=(argumentos[i].i)+(alturaImg/4);
        status[i]=pthread_create(&(operarios[i]),NULL,zerar,(void *)&argumentos[i]);  
        if (status[i])
                 exit(-1);
@@ -63,5 +37,4 @@ unsigned short **ParallelImageLoaderPthread::alocarMatriz(unsigned short **matri
             exit(-1);
     }
      return mat;
-   
 }

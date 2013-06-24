@@ -1,7 +1,4 @@
 /* 
- * File:   Image.cpp
- * Author: pargles
- * 
  * Created on 23 de Maio de 2013, 14:44
  */
 
@@ -97,7 +94,7 @@ int Image::posicaoCentral(int i,int j)
 }
 
 int Image::contarMoedas(int HeightStart, int HeightEnd) {
-    register int m, n;
+    register int m=0, n=0;
     int moedas = 0;
     for (int i = HeightStart + 1; i < HeightEnd - 1; i++) {
         for (int j = 1; j < bih->biWidth - 1; j++) {
@@ -110,7 +107,7 @@ int Image::contarMoedas(int HeightStart, int HeightEnd) {
                     moedas++;
                     m = i;
                     n = j;
-                    while (RED[m][n] == PRETO) {
+                    while ( RED[m][n] == PRETO ) {
                         n = posicaoCentral(m, n);
                         m--;
                     }
