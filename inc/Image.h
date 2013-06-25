@@ -7,6 +7,8 @@
 #include <fstream>
 #include <time.h>
  #include <omp.h>
+#include <map>
+#include <stdlib.h>
 #define PRETO 0
 #define BRANCO 255
 using namespace std;
@@ -53,7 +55,7 @@ public:
     void salvarImagemGrayScale(string nomeArquivo);
     void salvarImagemBlackAndWhite(string nomeArquivo);
     int posicaoCentral(int i,int j);
-    int contarMoedas(int HeightStart, int HeightEnd);
+    int contarMoedas(int HeightStart, int HeightEnd, map<string,bool>* treeMap);
     
     
     unsigned short **BLUE;

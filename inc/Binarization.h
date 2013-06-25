@@ -9,8 +9,8 @@ public:
     virtual short simpleThresholding(Image *img)=0;
     virtual short otsuThresholding(Image *img)=0;
     Image *img;
+    int time;
 private:
-    int executionTime;  
 
 };
 

@@ -53,17 +53,37 @@ short ParallelBinarization::otsuThresholding(Image *img){
     return threshold;
 }
 void ParallelBinarization::run(){
+    int t1 = clock();
     img->toGrayScaleParallel();   //necessario ter a matriz em grayScale
     short thresh = 245;
     cout << "thresh " << thresh << endl;
-    #pragma omp parallel for
-        for (int i = 0; i < img->bih->biHeight; i++) {
-            for (int j = 0; j < img->bih->biWidth; j++) {
-                if((img->RED[i][j]) > thresh)
-                    img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 255;
-                else img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 0;
+    #pragma omp parallel
+    {
+        #pragma omp sections nowait
+        {
+            #pragma omp section
+            {
+                for (int i = 0; i < img->bih->biHeight/2; i++) {
+                    for (int j = 0; j < img->bih->biWidth; j++) {
+                        if((img->RED[i][j]) > thresh)
+                            img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 255;
+                        else img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 0;
+                    }
+                }
+            }
+            #pragma omp section
+            {
+                for (int i = img->bih->biHeight/2; i < img->bih->biHeight; i++) {
+                    for (int j = 0; j < img->bih->biWidth; j++) {
+                        if((img->RED[i][j]) > thresh)
+                            img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 255;
+                        else img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 0;
+                    }
+                }
             }
         }
+    }
+    this->time = clock()-t1;
     cout << "binarizacao paralela" << "\n";
 }
     

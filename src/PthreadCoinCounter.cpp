@@ -29,10 +29,12 @@ void * filtro(void *p) {
     }
 }
 
+    map<string, bool> treeMap;
+    
 void * contador(void *p) {
     int inicio = ((ARGSC *) p)->i ;
     int fim = ((ARGSC *) p)->imax ;
-    int moedaAux = ((ARGSC *) p)->img->contarMoedas(inicio, fim);
+    int moedaAux = ((ARGSC *) p)->img->contarMoedas(inicio, fim, &treeMap);
     ((ARGSC *) p)->moedas = moedaAux;
 }
 
@@ -77,5 +79,6 @@ int PthreadCoinCounter::run() {
     for (int j = 0; j < 4; j++) {
         moedas += parametros[j].moedas;
     }
-    return moedas;
+    //return moedas;
+    return treeMap.size();
 }

@@ -12,10 +12,10 @@
 #include "../inc/OMPCoinCounter.h"
 #include "../inc/PthreadCoinCounter.h"
 #include <iostream>
+#include <map>
 
 int main(int argc, char * argv[]) {
     int numCPU; 
-	
 	Parser *commands = new Parser();
 	Binarization *imageBinarization;
 	CoinCounter *coins;
@@ -50,8 +50,9 @@ int main(int argc, char * argv[]) {
             imageBinarization = new SequentialBinarization(imgLoader->image);
             coins = new SequentialCoinCounter(imgLoader->image);
         }
-		imageBinarization->run();
-		cout<< "moedas "<< coins->run()<<endl;
+        imageBinarization->run();
+        cout<< "moedas "<< coins->run()<<endl;
+        cout << "tempo de processamento: " << imgLoader->time + imageBinarization->time +coins->time << endl;
         imgLoader->image->salvarImagemRGB(commands->getImageOutName());
 	return 0;
 }

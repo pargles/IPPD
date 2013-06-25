@@ -3,7 +3,6 @@
  */
 
 #include "../inc/Image.h"
-
 Image::Image(unsigned short **r, unsigned short **g, unsigned short **b, unsigned short **c, BITMAPFILEHEADER *bfh, BITMAPINFOHEADER *bih) {
     RED = r;
     GREEN = g;
@@ -60,70 +59,114 @@ void Image::toGrayScale(){
 }
 
 void Image::toGrayScaleParallel() {
-     unsigned short r,g,b, gray;
-#pragma omp parallel for
-        for (int i = 0; i < bih->biHeight; i++) {
-            for (int j = 0; j < bih->biWidth; j++) {
-                r = (RED[i][j] * 0.2989);//recasting para ficar unsigned
-                g = (GREEN[i][j] * 0.5870);//recasting para ficar unsigned
-                b = (BLUE[i][j] * 0.1140 );//recasting para ficar unsigned
-                gray = r + g + b;
-                RED[i][j] = gray;
-                GREEN[i][j] = gray;
-                BLUE[i][j] = gray;
-            }
-        }
+     
+     #pragma omp parallel
+     {
+        #pragma omp sections nowait
+         {
+            #pragma omp section
+             {
+                 unsigned short r,g,b, gray;
+                 for (int i = 0; i < bih->biHeight/2; i++) {
+                    for (int j = 0; j < bih->biWidth; j++) {
+                        r = (RED[i][j] * 0.2989);//recasting para ficar unsigned
+                        g = (GREEN[i][j] * 0.5870);//recasting para ficar unsigned
+                        b = (BLUE[i][j] * 0.1140 );//recasting para ficar unsigned
+                        gray = r + g + b;
+                        RED[i][j] = gray;
+                        GREEN[i][j] = gray;
+                        BLUE[i][j] = gray;
+                    }
+                }
+             }
+             #pragma omp section
+             {
+                 unsigned short r,g,b, gray;
+                 for (int i = bih->biHeight/2; i < bih->biHeight; i++) {
+                    for (int j = 0; j < bih->biWidth; j++) {
+                        r = (RED[i][j] * 0.2989);//recasting para ficar unsigned
+                        g = (GREEN[i][j] * 0.5870);//recasting para ficar unsigned
+                        b = (BLUE[i][j] * 0.1140 );//recasting para ficar unsigned
+                        gray = r + g + b;
+                        RED[i][j] = gray;
+                        GREEN[i][j] = gray;
+                        BLUE[i][j] = gray;
+                    }
+                }
+             }
+         }
+     }
 }
-
+int maxX = -1, maxY = -1;
 int Image::posicaoCentral(int i,int j)
 {
+    //cout << "inicio posicao central" << endl;
 	int contDir=j,contEsq=j;
-	register int k=j;
+	register int k=j;tempo de processamento: 1680016
 	COINS[i][k]=PRETO;
-	while(RED[i][k+1]==PRETO)
+	while(k+1 <= bih->biWidth && RED[i][k+1]==PRETO)
 	{
 		k++;contDir++;COINS[i][k]=PRETO;
+                //if (omp_get_thread_num() == 0) cout << i << ", " << j << endl;
+                if (k > maxX) maxX = k;
+                if (i > maxY) maxY = i;
 	}
 	k=j;
-	while(RED[i][k-1]==PRETO)
+	while(k-1 >= 0 && RED[i][k-1]==PRETO)
 	{
 		k--;contEsq--;COINS[i][k]=PRETO;
+                //if (omp_get_thread_num() == 0) cout << i << ", " << j << endl;
+                if (k > maxX) maxX = k;
+                if (i > maxY) maxY = i;
 	}
-	
-	return contEsq+((contDir-contEsq)/2);
+	//cout << "fim posicao central" << endl;
+	return (contDir+contEsq)/2;
 }
 
-int Image::contarMoedas(int HeightStart, int HeightEnd) {
+int Image::contarMoedas(int HeightStart, int HeightEnd, map<string,bool> *treeMap) {
     register int m=0, n=0;
     int moedas = 0;
+    
+    ;
     for (int i = HeightStart + 1; i < HeightEnd - 1; i++) {
         for (int j = 1; j < bih->biWidth - 1; j++) {
+            //if (omp_get_thread_num() == 0) cout << i << ", " << j << endl;
             if (RED[i - 1][j - 1] == PRETO && RED[i - 1][j] == PRETO && RED[i - 1][j + 1] == PRETO &&
                     RED[i][j - 1] == PRETO && RED[i][j] == PRETO && RED[i][j + 1] == PRETO &&
                     RED[i + 1][j - 1] == PRETO && RED[i + 1][j] == PRETO && RED[i + 1][j + 1] == PRETO) {
+                //if (omp_get_thread_num() == 0) cout << "entrou em uma moeda" << endl;
                 if (COINS[i - 1][j - 1] == BRANCO && COINS[i - 1][j] == BRANCO && COINS[i - 1][j + 1] == BRANCO &&
                         COINS[i][j - 1] == BRANCO && COINS[i][j] == BRANCO && COINS[i][j + 1] == BRANCO &&
                         COINS[i + 1][j - 1] == BRANCO && COINS[i + 1][j] == BRANCO && COINS[i + 1][j + 1] == BRANCO) {
+                   //cout << "inicio verificacao moedas" << endl;
                     moedas++;
                     m = i;
                     n = j;
-                    while ( RED[m][n] == PRETO ) {
+                    while (m >= 0 && RED[m][n] == PRETO ) {
                         n = posicaoCentral(m, n);
                         m--;
                     }
+                    //cout << "laco 1 terminado" << endl;
                     m = i;
                     n = j;
-                    while (RED[m][n] == PRETO) {
+                    while (m <= bih->biHeight && RED[m][n] == PRETO) {
                         n = posicaoCentral(m, n);
                         m++;
                     }
-
+                    char* temp = new char[100];
+                    sprintf(temp,"%d.%d",maxX,maxY);
+                    string* s = new string(temp);
+                   // if (omp_get_thread_num() == 0) cout << *s << endl;
+                    //treeMap->insert(std::make_pair(*s,true));
+                    (*treeMap)[*s] = true;
+                    //cout << treeMap->size() << endl;
+                    maxX = maxY = -1;
                 }
             }
         }
     }
 
-    return moedas;
+    return treeMap->size();
 }
 
 ///////////////////////////////////////////////////////////////////

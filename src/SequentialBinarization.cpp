@@ -83,5 +83,6 @@ void SequentialBinarization::run() {
             else img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 0;
         }
     }
+    this->time = clock()-initTime;
 }
 

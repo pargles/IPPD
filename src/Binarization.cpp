@@ -7,8 +7,8 @@
  *@brief Método construtor, inicializa a classe Binarization com valores default.
  */
 Binarization::Binarization(Image *im) {
-    this->executionTime = 0;
     this->img = im;
+    this->time = 0;
     //img->printarInformacoesDaImagem();
 }
 

@@ -22,8 +22,11 @@ void SequentialCoinCounter::filtrar() {
 }
     
 int SequentialCoinCounter::run(){
-	filtrar();
-    return img->contarMoedas(0, img->bih->biHeight);;
+    int t1 = clock();
+    filtrar();
+    map<string,bool> treeMap;
+    return img->contarMoedas(0, img->bih->biHeight, &treeMap);
+    this->time = clock()-t1;
 }
     
 

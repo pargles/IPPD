@@ -16,7 +16,7 @@ public:
     unsigned short **COINS;
     string path;
     Image *image;
-    
+    int time;
 private:
     
 };

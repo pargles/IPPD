@@ -10,6 +10,7 @@
 
 ImageLoader::ImageLoader(string path) {
     this->path = path;
+    this->time = 0;
     //load();
 }
 
@@ -30,16 +31,17 @@ void ImageLoader::load() {
     ifs.read(temp, sizeof(Image::BITMAPINFOHEADER));
     bih = (Image::BITMAPINFOHEADER*)(temp); 
     //printarInformacoesDaImagem();
-    
+    int t1 = clock();
     BLUE = alocarMatriz(BLUE);
     GREEN = alocarMatriz(GREEN);
     RED = alocarMatriz(RED);
     COINS = alocarMatriz(COINS);
+    time = clock()-t1;
     for (int i = 0; i < bih->biHeight; i++) {
         for (int j = 0; j < bih->biWidth; j++) {
-			COINS[i][j] = BRANCO;
-		}
-	}
+                COINS[i][j] = BRANCO;
+        }
+    }
     
     ifs.seekg(bfh->bfOffBits, ios::beg); // posiciona o ponteiro do arquivo aonde começam as informações de cor
     char r,g,b;

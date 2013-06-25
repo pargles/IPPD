@@ -8,8 +8,8 @@ public:
     virtual int run()=0;
     virtual void filtrar()=0;
     Image *img;
+    int time;
 private:
-    int executionTime;  
 
 };
 
