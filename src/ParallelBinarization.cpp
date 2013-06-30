@@ -61,26 +61,14 @@ void ParallelBinarization::run(){
     {
         #pragma omp sections nowait
         {
-            #pragma omp section
-            {
-                for (int i = 0; i < img->bih->biHeight/2; i++) {
+            #pragma omp parallel for
+                for (int i = 0; i < img->bih->biHeight; i++) {
                     for (int j = 0; j < img->bih->biWidth; j++) {
                         if((img->RED[i][j]) > thresh)
                             img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 255;
                         else img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 0;
                     }
-                }
-            }
-            #pragma omp section
-            {
-                for (int i = img->bih->biHeight/2; i < img->bih->biHeight; i++) {
-                    for (int j = 0; j < img->bih->biWidth; j++) {
-                        if((img->RED[i][j]) > thresh)
-                            img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 255;
-                        else img->RED[i][j] = img->GREEN[i][j] = img->BLUE[i][j] = 0;
-                    }
-                }
-            }
+                }           
         }
     }
     this->time = clock()-t1;

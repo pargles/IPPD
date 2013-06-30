@@ -43,7 +43,7 @@ int OMPCoinCounter::run(){
     filtrar();
     int moedas1 = 0, moedas2 = 0, moedas3 = 0, moedas4 = 0;
     map<string,bool> treeMap;
-    int passo = img->bih->biHeight / 4;
+    int passo = img->bih->biHeight / omp_get_num_threads();
     int p1 = passo;
     int p2 = p1 + passo;
     int p3 = p2 + passo;
@@ -52,26 +52,11 @@ int OMPCoinCounter::run(){
         printf("%d threads \n", omp_get_num_threads());
         #pragma omp sections nowait
         {
-            #pragma omp section
-            {
-                cout << "thread " << omp_get_thread_num() << " executando processo 1 " << endl;
-                img->contarMoedas(0, p1, &treeMap);
-            }
-            #pragma omp section
-            {
-                cout << "thread " << omp_get_thread_num() << " executando processo 2 " << endl;
-                img->contarMoedas(p1+1, p2, &treeMap);
-            }
-            #pragma omp section
-            {
-                cout << "thread " << omp_get_thread_num() << " executando processo 3 " << endl;
-                img->contarMoedas(p2+1, p3, &treeMap);
-            }
-            #pragma omp section
-            {
-                cout << "thread " << omp_get_thread_num() << " executando processo 4 " << endl;
-                img->contarMoedas(p3+1, img->bih->biHeight, &treeMap);
-            }
+            #pragma omp parallel for
+                for (int p1 = 0; p1 < img->bih->biHeight; p1 = p1+passo) {
+                        cout << "thread " << omp_get_thread_num() << " executando processo " << p1 << endl;
+                        img->contarMoedas(p1,p1 +passo, &treeMap);
+                }
         }
     }
     return treeMap.size();
