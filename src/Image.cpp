@@ -102,7 +102,7 @@ int Image::posicaoCentral(int i,int j)
 {
     //cout << "inicio posicao central" << endl;
 	int contDir=j,contEsq=j;
-	register int k=j;tempo de processamento: 1680016
+	register int k=j;//tempo de processamento: 1680016
 	COINS[i][k]=PRETO;
 	while(k+1 <= bih->biWidth && RED[i][k+1]==PRETO)
 	{
